@@ -4,12 +4,12 @@ A full-stack MERN application where **Designers** upload product mockups and **C
 
 ## Tech Stack
 
-| Layer | Tech |
-|---|---|
+| Layer    | Tech                                                                                       |
+| -------- | ------------------------------------------------------------------------------------------ |
 | Frontend | React 18, Vite, Tailwind CSS, React Router v6, Axios, Zod, React Hook Form, react-dropzone |
-| Backend | Node.js, Express, MongoDB (Mongoose), JWT, Multer, Cloudinary, express-validator |
-| Storage | Cloudinary (images), MongoDB Atlas (data) |
-| Deploy | Vercel (frontend) + Render (backend) |
+| Backend  | Node.js, Express, MongoDB (Mongoose), JWT, Multer, Cloudinary, express-validator           |
+| Storage  | Cloudinary (images), MongoDB Atlas (data)                                                  |
+| Deploy   | Vercel (frontend) + Render (backend)                                                       |
 
 ---
 
@@ -17,6 +17,8 @@ A full-stack MERN application where **Designers** upload product mockups and **C
 
 ```
 BNV/
+├── postman/
+│   └── BNV_API.postman_collection.json   # Import into Postman (v2.1)
 ├── backend/
 │   ├── src/
 │   │   ├── config/        # db.js, cloudinary.js
@@ -44,6 +46,7 @@ BNV/
 ## Local Setup
 
 ### Prerequisites
+
 - Node.js >= 18
 - npm >= 9
 
@@ -62,6 +65,7 @@ npm install
 ### 2. Environment Variables
 
 **`backend/.env`**
+
 ```
 MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/bnv_mockups
 JWT_SECRET=your_jwt_secret_key
@@ -75,6 +79,7 @@ CLIENT_URL=http://localhost:5173
 ```
 
 **`frontend/.env`**
+
 ```
 VITE_API_URL=http://localhost:5000/api
 ```
@@ -97,15 +102,15 @@ App runs at: http://localhost:5173
 
 ## Navigation
 
-| Route | Access | Description |
-|---|---|---|
-| `/login` | Public | Login with role tab (Designer / Client) |
-| `/register` | Public | Register with role selection |
-| `/dashboard` | All users | Stats overview + recent mockups |
-| `/mockups` | All users | Browse/manage mockups |
-| `/mockups/upload` | Designer only | Upload new mockup to Cloudinary |
-| `/orders` | All users | View / manage orders with status |
-| `/profile` | All users | User profile info |
+| Route             | Access        | Description                             |
+| ----------------- | ------------- | --------------------------------------- |
+| `/login`          | Public        | Login with role tab (Designer / Client) |
+| `/register`       | Public        | Register with role selection            |
+| `/dashboard`      | All users     | Stats overview + recent mockups         |
+| `/mockups`        | All users     | Browse/manage mockups                   |
+| `/mockups/upload` | Designer only | Upload new mockup to Cloudinary         |
+| `/orders`         | All users     | View / manage orders with status        |
+| `/profile`        | All users     | User profile info                       |
 
 ---
 
@@ -118,9 +123,11 @@ All protected routes require: `Authorization: Bearer <token>`
 ### Auth
 
 #### POST `/auth/register`
+
 Create a new account.
 
 **Body:**
+
 ```json
 {
   "name": "John Doe",
@@ -129,25 +136,30 @@ Create a new account.
   "role": "designer"
 }
 ```
+
 **Response:** `201` `{ success, token, user }`
 
 ---
 
 #### POST `/auth/login`
+
 Login and receive JWT.
 
 **Body:**
+
 ```json
 {
   "email": "john@example.com",
   "password": "secret123"
 }
 ```
+
 **Response:** `200` `{ success, token, user }`
 
 ---
 
 #### GET `/auth/me` 🔒
+
 Get current user profile.
 
 **Response:** `200` `{ success, user }`
@@ -157,6 +169,7 @@ Get current user profile.
 ### Mockups
 
 #### GET `/mockups` 🔒
+
 List all mockups.
 
 **Query params:** `category`, `sort`, `search`, `page`, `limit`
@@ -166,6 +179,7 @@ List all mockups.
 ---
 
 #### GET `/mockups/my` 🔒 (Designer)
+
 List authenticated designer's mockups.
 
 **Query params:** `category`, `sort`
@@ -173,11 +187,13 @@ List authenticated designer's mockups.
 ---
 
 #### GET `/mockups/:id` 🔒
+
 Get single mockup by ID.
 
 ---
 
 #### POST `/mockups` 🔒 (Designer only)
+
 Upload a new mockup.
 
 **Content-Type:** `multipart/form-data`
@@ -189,6 +205,7 @@ Upload a new mockup.
 ---
 
 #### PUT `/mockups/:id` 🔒 (Designer, owner only)
+
 Update mockup. Optionally replace image with `image` field.
 
 **Content-Type:** `multipart/form-data`
@@ -196,6 +213,7 @@ Update mockup. Optionally replace image with `image` field.
 ---
 
 #### DELETE `/mockups/:id` 🔒 (Designer, owner only)
+
 Delete mockup and remove from Cloudinary.
 
 **Response:** `200` `{ success, message }`
@@ -205,6 +223,7 @@ Delete mockup and remove from Cloudinary.
 ### Orders
 
 #### GET `/orders` 🔒
+
 List orders. Clients see own orders; Designers see orders for their mockups.
 
 **Query params:** `status`, `page`, `limit`
@@ -212,9 +231,11 @@ List orders. Clients see own orders; Designers see orders for their mockups.
 ---
 
 #### POST `/orders` 🔒 (Client only)
+
 Place a new order.
 
 **Body:**
+
 ```json
 {
   "mockupId": "64abc...",
@@ -222,17 +243,21 @@ Place a new order.
   "notes": "Optional instructions"
 }
 ```
+
 **Response:** `201` `{ success, order }`
 
 ---
 
 #### PATCH `/orders/:id/status` 🔒 (Designer only)
+
 Update order status.
 
 **Body:**
+
 ```json
 { "status": "active" }
 ```
+
 Status flow: `pending → active → completed`
 
 ---
@@ -240,9 +265,11 @@ Status flow: `pending → active → completed`
 ### Dashboard
 
 #### GET `/dashboard/stats` 🔒
+
 Returns aggregated stats for the current user (role-dependent).
 
 **Designer response:**
+
 ```json
 {
   "stats": {
@@ -256,6 +283,7 @@ Returns aggregated stats for the current user (role-dependent).
 ```
 
 **Client response:**
+
 ```json
 {
   "stats": {
@@ -268,52 +296,46 @@ Returns aggregated stats for the current user (role-dependent).
 
 ---
 
-## Postman Collection
+## Postman collection (API testing for reviewers)
 
-Import this JSON into Postman:
+A ready-to-import **Collection v2.1** file lives in the repo. Reviewers can also open the **same collection in Postman on the web** (sign in to Postman may be required):
 
-```json
-{
-  "info": { "name": "BNV API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
-  "variable": [
-    { "key": "base_url", "value": "http://localhost:5000/api" },
-    { "key": "token", "value": "" }
-  ],
-  "item": [
-    {
-      "name": "Auth",
-      "item": [
-        { "name": "Register", "request": { "method": "POST", "url": "{{base_url}}/auth/register", "body": { "mode": "raw", "raw": "{\"name\":\"Test User\",\"email\":\"test@test.com\",\"password\":\"test123\",\"role\":\"designer\"}", "options": { "raw": { "language": "json" } } } } },
-        { "name": "Login", "request": { "method": "POST", "url": "{{base_url}}/auth/login", "body": { "mode": "raw", "raw": "{\"email\":\"test@test.com\",\"password\":\"test123\"}", "options": { "raw": { "language": "json" } } } } },
-        { "name": "Get Me", "request": { "method": "GET", "url": "{{base_url}}/auth/me", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
-      ]
-    },
-    {
-      "name": "Mockups",
-      "item": [
-        { "name": "List All", "request": { "method": "GET", "url": "{{base_url}}/mockups", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
-        { "name": "My Mockups", "request": { "method": "GET", "url": "{{base_url}}/mockups/my", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
-        { "name": "Upload Mockup", "request": { "method": "POST", "url": "{{base_url}}/mockups", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "formdata", "formdata": [{ "key": "image", "type": "file" }, { "key": "name", "value": "Test Mockup" }, { "key": "price", "value": "29.99" }, { "key": "category", "value": "Packaging" }] } } },
-        { "name": "Delete Mockup", "request": { "method": "DELETE", "url": "{{base_url}}/mockups/:id", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
-      ]
-    },
-    {
-      "name": "Orders",
-      "item": [
-        { "name": "List Orders", "request": { "method": "GET", "url": "{{base_url}}/orders", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } },
-        { "name": "Place Order", "request": { "method": "POST", "url": "{{base_url}}/orders", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\"mockupId\":\"MOCKUP_ID\",\"quantity\":3}", "options": { "raw": { "language": "json" } } } } },
-        { "name": "Update Status", "request": { "method": "PATCH", "url": "{{base_url}}/orders/:id/status", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "body": { "mode": "raw", "raw": "{\"status\":\"active\"}", "options": { "raw": { "language": "json" } } } } }
-      ]
-    },
-    {
-      "name": "Dashboard",
-      "item": [
-        { "name": "Stats", "request": { "method": "GET", "url": "{{base_url}}/dashboard/stats", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }] } }
-      ]
-    }
-  ]
-}
-```
+| Item | Detail |
+| --- | --- |
+| **View in Postman (web)** | [Open shared BNV collection](https://solar-crescent-447362.postman.co/workspace/My-Workspace~b1658449-7dff-40e2-89ca-e8b1da47cad2/collection/24720323-5b118bb3-5445-4578-b12a-0fc1a213f1b9?action=share&source=copy-link&creator=24720323) |
+| **File in repo** | [`postman/BNV_API.postman_collection.json`](postman/BNV_API.postman_collection.json) |
+| **Schema** | [Postman Collection v2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json) |
+
+Use the link to browse requests and documentation in the browser; use the JSON file to **Import** into your own Postman app if you prefer a local copy.
+
+### How to import (Postman)
+
+1. Start the backend (`cd backend` → `npm run dev`, default `http://localhost:5000`).
+2. In Postman: **Import** → **Upload Files** and select `postman/BNV_API.postman_collection.json`, **or** drag the file onto the Import window.
+3. Open the collection **BNV — Mockup Ordering API**.
+4. Optional: select the collection → **Variables** tab — set `host_url` / `base_url` if your API runs elsewhere (e.g. production).
+5. Run **Auth → POST Login** (or **POST Register**). A **Test** script saves the JWT into the collection variable `token` automatically.
+6. Call protected routes; for **GET Mockup by ID**, **PUT/DELETE Mockup**, set `mockup_id`. For **PATCH Order status**, set `order_id`.
+
+### Collection variables (best practice)
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `host_url` | `http://localhost:5000` | Health check (`GET /health` — not under `/api`) |
+| `base_url` | `http://localhost:5000/api` | All API routes |
+| `token` | *(empty)* | Filled after Login/Register |
+| `mockup_id` | *(empty)* | MongoDB `_id` for mockup routes |
+| `order_id` | *(empty)* | MongoDB `_id` for order status |
+
+### Folders in the collection
+
+- **Health** — `GET /health` (no auth)
+- **Auth** — Register, Login (auto-save token), Me
+- **Mockups** — list, my list, by id, create (multipart), update, delete
+- **Orders** — list, place order (client), patch status (designer)
+- **Dashboard** — stats
+
+You can also copy the entire contents of `postman/BNV_API.postman_collection.json` and use **Import → Raw text** → paste → **Import** (same result as uploading the file).
 
 ---
 

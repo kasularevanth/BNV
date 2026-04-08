@@ -1,0 +1,270 @@
+{
+  "info": {
+    "_postman_id": "bnv-mockup-api-v1",
+    "name": "BNV — Mockup Ordering API",
+    "description": "REST API for BNV (designers upload mockups, clients place orders).\n\n**Setup:**\n1. Set `base_url` if not using local default.\n2. Run **Register** or **Login** — the JWT is saved to `token` automatically.\n3. Use **Designer** token for mockup create/update/delete and order status.\n4. Use **Client** token for placing orders.\n\n**Base path:** `/api` is included in `base_url`. Health check uses `host_url` (no `/api`).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "host_url", "value": "http://localhost:5000" },
+    { "key": "base_url", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "mockup_id", "value": "" },
+    { "key": "order_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Health (no auth)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{host_url}}/health",
+            "description": "Liveness check. Does not require JWT."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.token) { pm.collectionVariables.set('token', j.token); }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Designer\",\n  \"email\": \"designer@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"designer\"\n}"
+            },
+            "url": "{{base_url}}/auth/register",
+            "description": "`role`: `designer` | `client`. Saves JWT to collection variable `token` on success."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  const j = pm.response.json();",
+                  "  if (j.token) { pm.collectionVariables.set('token', j.token); }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"designer@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{base_url}}/auth/login",
+            "description": "Saves JWT to `token` on success."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/auth/me",
+            "description": "Current user profile. Requires `Authorization: Bearer <token>`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Mockups",
+      "item": [
+        {
+          "name": "GET List mockups (query optional)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/mockups?sort=Recently%20Edited&page=1&limit=20",
+            "description": "Browse mockups. All authenticated users."
+          },
+          "response": []
+        },
+        {
+          "name": "GET My mockups (designer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/mockups/my",
+            "description": "**Designer only.** List mockups owned by the logged-in designer."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Mockup by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/mockups/{{mockup_id}}",
+            "description": "Set `mockup_id` collection variable first."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create mockup (designer, multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "image", "type": "file", "src": [], "description": "PNG, JPG, or WebP" },
+                { "key": "name", "value": "Eco-Box Series V2", "type": "text" },
+                { "key": "description", "value": "Kraft carton mockup, matte finish.", "type": "text" },
+                { "key": "price", "value": "49.00", "type": "text" },
+                { "key": "category", "value": "Packaging", "type": "text" }
+              ]
+            },
+            "url": "{{base_url}}/mockups",
+            "description": "**Designer only.** Choose file for `image`. Categories: Packaging, Bottles, Apparel, Beverage, Electronics, Other."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update mockup (designer, optional new image)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "image", "type": "file", "src": [], "disabled": true },
+                { "key": "name", "value": "Eco-Box Series V2 Updated", "type": "text" },
+                { "key": "description", "value": "Updated description.", "type": "text" },
+                { "key": "price", "value": "52.00", "type": "text" },
+                { "key": "category", "value": "Packaging", "type": "text" }
+              ]
+            },
+            "url": "{{base_url}}/mockups/{{mockup_id}}",
+            "description": "**Designer, owner only.** Enable `image` to replace asset on Cloudinary."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Mockup (designer)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/mockups/{{mockup_id}}",
+            "description": "**Designer, owner only.** Removes Cloudinary asset."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "GET List orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/orders?page=1&limit=20",
+            "description": "Clients see their orders; designers see orders for their mockups."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Place order (client)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mockupId\": \"REPLACE_WITH_MOCKUP_OBJECT_ID\",\n  \"quantity\": 2,\n  \"notes\": \"Rush if possible\"\n}"
+            },
+            "url": "{{base_url}}/orders",
+            "description": "**Client only.** Replace `mockupId` with a real Mockup `_id` from MongoDB or list response."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Order status (designer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{base_url}}/orders/{{order_id}}/status",
+            "description": "**Designer only** (must own the mockup). Status: pending | active | completed | cancelled"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "GET Dashboard stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": "{{base_url}}/dashboard/stats",
+            "description": "Role-specific aggregates (designer vs client)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
