@@ -43,15 +43,17 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 w-full max-w-md p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center p-4 py-8">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 w-full max-w-md p-6 sm:p-8">
         {/* Logo */}
         <div className="flex flex-col items-center mb-6">
-          <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mb-4">
+          <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-md shadow-indigo-200">
             <Zap className="w-6 h-6 text-white fill-white" />
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900">Create your account</h1>
-          <p className="text-sm text-gray-500 mt-1">Join the Kinetic Gallery ecosystem today.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
+          <p className="text-sm text-gray-500 mt-1 text-center">
+            Join the Kinetic Gallery ecosystem today.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -63,7 +65,7 @@ const RegisterPage = () => {
             <input
               {...register('name')}
               placeholder="John Doe"
-              className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+              className="w-full px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
             />
             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
           </div>
@@ -77,13 +79,13 @@ const RegisterPage = () => {
               {...register('email')}
               type="email"
               placeholder="john@example.com"
-              className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+              className="w-full px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
             />
             {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
           </div>
 
-          {/* Password row */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Password row — stacked on mobile, side-by-side on sm+ */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                 Password
@@ -92,7 +94,7 @@ const RegisterPage = () => {
                 {...register('password')}
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                className="w-full px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
               />
               {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
             </div>
@@ -104,7 +106,7 @@ const RegisterPage = () => {
                 {...register('confirmPassword')}
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 bg-gray-100 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                className="w-full px-4 py-3 bg-gray-100 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
               />
               {errors.confirmPassword && (
                 <p className="text-xs text-red-500 mt-1">{errors.confirmPassword.message}</p>
@@ -118,42 +120,36 @@ const RegisterPage = () => {
               I Am A...
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setValue('role', 'designer', { shouldValidate: true })}
-                className={`flex flex-col items-center justify-center py-3 px-4 rounded-xl border-2 transition font-medium text-sm gap-1 ${
-                  selectedRole === 'designer'
-                    ? 'bg-indigo-600 border-indigo-600 text-white'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-indigo-300'
-                }`}
-              >
-                <Palette className="w-5 h-5" />
-                Designer
-              </button>
-              <button
-                type="button"
-                onClick={() => setValue('role', 'client', { shouldValidate: true })}
-                className={`flex flex-col items-center justify-center py-3 px-4 rounded-xl border-2 transition font-medium text-sm gap-1 ${
-                  selectedRole === 'client'
-                    ? 'bg-indigo-600 border-indigo-600 text-white'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-indigo-300'
-                }`}
-              >
-                <Briefcase className="w-5 h-5" />
-                Client
-              </button>
+              {[
+                { role: 'designer', icon: Palette, label: 'Designer' },
+                { role: 'client', icon: Briefcase, label: 'Client' },
+              ].map(({ role, icon: Icon, label }) => (
+                <button
+                  key={role}
+                  type="button"
+                  onClick={() => setValue('role', role, { shouldValidate: true })}
+                  className={`flex flex-col items-center justify-center py-3 px-4 rounded-xl border-2 transition font-medium text-sm gap-1.5 ${
+                    selectedRole === role
+                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-indigo-300 hover:bg-indigo-50'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {label}
+                </button>
+              ))}
             </div>
             {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>}
           </div>
 
           {/* Terms */}
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-2.5">
             <input
               type="checkbox"
               id="terms"
               checked={termsChecked}
               onChange={(e) => setValue('terms', e.target.checked, { shouldValidate: true })}
-              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 flex-shrink-0"
             />
             <label htmlFor="terms" className="text-xs text-gray-500 leading-relaxed">
               By creating an account, I agree to the{' '}
@@ -165,7 +161,7 @@ const RegisterPage = () => {
           {errors.terms && <p className="text-xs text-red-500 -mt-2">{errors.terms.message}</p>}
 
           {apiError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
               {apiError}
             </div>
           )}
@@ -173,9 +169,16 @@ const RegisterPage = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold rounded-xl transition text-sm"
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-60 text-white font-semibold rounded-xl transition text-sm shadow-md shadow-indigo-200"
           >
-            {isSubmitting ? 'Creating Account...' : 'Create Account'}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Creating Account...
+              </span>
+            ) : (
+              'Create Account'
+            )}
           </button>
         </form>
 

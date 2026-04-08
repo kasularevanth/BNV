@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, ShoppingBag, AlertCircle, CheckCircle2, Plus, Pencil } from 'lucide-react';
+import { ShoppingBag, CheckCircle2, Plus, Pencil } from 'lucide-react';
 import DashboardLayout from '../components/common/DashboardLayout';
 import StatCard from '../components/common/StatCard';
 import { useAuth } from '../context/AuthContext';
@@ -10,7 +10,7 @@ import usePolling from '../hooks/usePolling';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  const { user, isDesigner } = useAuth();
+  const { isDesigner } = useAuth();
   const [stats, setStats] = useState(null);
   const [recentMockups, setRecentMockups] = useState([]);
 
@@ -23,8 +23,7 @@ const DashboardPage = () => {
           : getMockups({ sort: 'Recently Edited', limit: 4 }),
       ]);
       setStats(statsRes.data.stats);
-      const list = isDesigner ? mockupsRes.data.mockups : mockupsRes.data.mockups;
-      setRecentMockups(list.slice(0, 4));
+      setRecentMockups((mockupsRes.data.mockups || []).slice(0, 4));
     } catch {
       // silently fail on polling error
     }
@@ -36,9 +35,9 @@ const DashboardPage = () => {
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Performance Overview</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Performance Overview</h1>
             <p className="text-sm text-gray-500 mt-0.5">
               Track your packaging assets and supply chain status in real-time.
             </p>
@@ -46,7 +45,7 @@ const DashboardPage = () => {
           {isDesigner && (
             <button
               onClick={() => navigate('/mockups/upload')}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 rounded-xl text-sm font-medium text-gray-700 transition"
+              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 rounded-xl text-sm font-medium text-gray-700 transition shadow-sm self-start"
             >
               <Plus className="w-4 h-4" />
               New Mockup
@@ -54,8 +53,8 @@ const DashboardPage = () => {
           )}
         </div>
 
-        {/* Stats cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Stats cards — 1 col mobile, 2 col sm, 4 col lg */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
           {isDesigner ? (
             <>
               <StatCard
@@ -112,15 +111,35 @@ const DashboardPage = () => {
 
         {/* Recent Mockups */}
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Mockups</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Mockups</h2>
+            <button
+              onClick={() => navigate('/mockups')}
+              className="text-sm text-indigo-600 hover:underline font-medium"
+            >
+              View all
+            </button>
+          </div>
+
           {recentMockups.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
+            <div className="text-center py-12 sm:py-16 bg-white rounded-2xl border border-gray-100">
+              <div className="w-12 h-12 bg-gray-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
+                <ShoppingBag className="w-5 h-5 text-gray-400" />
+              </div>
               <p className="text-gray-400 text-sm">
                 {isDesigner ? 'No mockups yet. Upload your first one!' : 'No mockups available.'}
               </p>
+              {isDesigner && (
+                <button
+                  onClick={() => navigate('/mockups/upload')}
+                  className="mt-3 text-sm text-indigo-600 hover:underline font-medium"
+                >
+                  Upload now →
+                </button>
+              )}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {recentMockups.map((mockup) => (
                 <RecentMockupCard key={mockup._id} mockup={mockup} />
               ))}
@@ -133,7 +152,7 @@ const DashboardPage = () => {
 };
 
 const RecentMockupCard = ({ mockup }) => (
-  <div className="bg-white rounded-xl border border-gray-100 overflow-hidden group">
+  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden group hover:shadow-md transition-shadow">
     <div className="aspect-square bg-gray-100 overflow-hidden">
       <img
         src={mockup.imageUrl}
@@ -143,11 +162,11 @@ const RecentMockupCard = ({ mockup }) => (
     </div>
     <div className="p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-medium text-gray-800 truncate">{mockup.name}</span>
+        <span className="text-xs sm:text-sm font-medium text-gray-800 truncate">{mockup.name}</span>
         <Pencil className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
       </div>
       <p className="text-xs text-gray-400 mt-0.5">
-        Edited {new Date(mockup.updatedAt).toLocaleDateString()}
+        {new Date(mockup.updatedAt).toLocaleDateString()}
       </p>
     </div>
   </div>
