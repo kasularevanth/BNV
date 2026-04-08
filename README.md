@@ -343,12 +343,26 @@ You can also copy the entire contents of `postman/BNV_API.postman_collection.jso
 
 ### Backend → Render
 
-1. Push `backend/` to a GitHub repo
-2. Create a new **Web Service** on [render.com](https://render.com)
-3. Set build command: `npm install`
-4. Set start command: `node server.js`
-5. Add all env vars from `backend/.env` in the Render dashboard
-6. Note your Render URL (e.g. `https://bnv-api.onrender.com`)
+1. Connect the **BNV** GitHub repo (monorepo with `backend/` and `frontend/`).
+2. Create a **Web Service** on [render.com](https://render.com).
+3. **Root Directory:** `backend` (so `npm install` and `node server.js` run from the folder that contains `package.json` and `server.js`).
+4. **Build command:** `npm install`
+5. **Start command:** `node server.js`
+6. **Environment:** Render does **not** ship your local `.env`; copy every variable from `backend/.env` into **Environment** on the service. Required at minimum:
+
+   | Variable | Notes |
+   | --- | --- |
+   | `MONGO_URI` | Atlas connection string (must allow network access — see below) |
+   | `JWT_SECRET` | Any long random string |
+   | `JWT_EXPIRES_IN` | e.g. `7d` |
+   | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | For image uploads |
+   | `NODE_ENV` | `production` |
+   | `CLIENT_URL` | Your deployed frontend origin, e.g. `https://your-app.vercel.app` |
+   | `PORT` | Usually **omit** — Render sets `PORT` automatically |
+
+7. **MongoDB Atlas → Network Access:** allow **`0.0.0.0/0`** (all IPs) or Render’s IPs so the cloud DB accepts connections from Render’s servers.
+
+**Deploy exits with status 1 (crash on startup):** Almost always **missing `MONGO_URI` / `JWT_SECRET` on Render**, or **Atlas blocking the connection**. Check the Render **Logs** tab for `[ENV] Missing required variable(s)` or `MongoDB connection error`. The app logs a clear message if required env vars are absent.
 
 ### Frontend → Vercel
 
