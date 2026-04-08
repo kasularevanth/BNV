@@ -2,6 +2,8 @@
 
 A full-stack MERN application where **Designers** upload product mockups and **Clients** browse and place orders.
 
+**Live demo (Vercel):** [https://bnv-brown.vercel.app/login](https://bnv-brown.vercel.app/login) — App root: [https://bnv-brown.vercel.app](https://bnv-brown.vercel.app)
+
 ## Tech Stack
 
 | Layer    | Tech                                                                                       |
@@ -357,7 +359,7 @@ You can also copy the entire contents of `postman/BNV_API.postman_collection.jso
    | `JWT_EXPIRES_IN` | e.g. `7d` |
    | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | For image uploads |
    | `NODE_ENV` | `production` |
-   | `CLIENT_URL` | Your deployed frontend origin, e.g. `https://your-app.vercel.app` |
+   | `CLIENT_URL` | Your deployed frontend origin, e.g. `https://bnv-brown.vercel.app` |
    | `PORT` | Usually **omit** — Render sets `PORT` automatically |
 
 7. **MongoDB Atlas → Network Access:** allow **`0.0.0.0/0`** (all IPs) or Render’s IPs so the cloud DB accepts connections from Render’s servers.
@@ -374,7 +376,7 @@ You can also copy the entire contents of `postman/BNV_API.postman_collection.jso
    Both resolve to `https://<host>/api/...` for Axios.
 4. **SPA routing:** The repo includes [`frontend/vercel.json`](frontend/vercel.json) so refreshing on routes like `/login` or `/dashboard` serves `index.html` instead of `404 NOT_FOUND`.
 5. **Build:** Install `npm install`, build `npm run build`, output `dist` (defaults work if Root Directory is `frontend`).
-6. After deploy, set **`CLIENT_URL`** on Render to your Vercel URL (e.g. `https://your-app.vercel.app`) so CORS allows the browser to call the API.
+6. After deploy, set **`CLIENT_URL`** on Render to your Vercel origin (e.g. `https://bnv-brown.vercel.app`) so CORS allows the browser to call the API.
 
 **404 on `/auth/login` when calling Render:** The backend only exposes routes under **`/api`** (e.g. `POST /api/auth/login`). If the browser requests `https://<render-host>/auth/login`, that URL does not exist — use `VITE_API_URL` pointing at the Render host (see step 3). The frontend code normalizes the base URL to always use `/api`.
 
