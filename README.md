@@ -366,10 +366,17 @@ You can also copy the entire contents of `postman/BNV_API.postman_collection.jso
 
 ### Frontend → Vercel
 
-1. Push `frontend/` to a GitHub repo
-2. Import on [vercel.com](https://vercel.com)
-3. Set env var: `VITE_API_URL=https://bnv-api.onrender.com/api`
-4. Deploy
+1. Connect the same **BNV** GitHub repo.
+2. **Root Directory:** `frontend` (the folder that contains `package.json` and `vite.config.js`).
+3. **Environment variable:** `VITE_API_URL` = your Render API origin **with or without** `/api` (the app appends `/api` if missing). Examples:
+   - `https://bnv-tfdx.onrender.com`  
+   - `https://bnv-tfdx.onrender.com/api`  
+   Both resolve to `https://<host>/api/...` for Axios.
+4. **SPA routing:** The repo includes [`frontend/vercel.json`](frontend/vercel.json) so refreshing on routes like `/login` or `/dashboard` serves `index.html` instead of `404 NOT_FOUND`.
+5. **Build:** Install `npm install`, build `npm run build`, output `dist` (defaults work if Root Directory is `frontend`).
+6. After deploy, set **`CLIENT_URL`** on Render to your Vercel URL (e.g. `https://your-app.vercel.app`) so CORS allows the browser to call the API.
+
+**404 on `/auth/login` when calling Render:** The backend only exposes routes under **`/api`** (e.g. `POST /api/auth/login`). If the browser requests `https://<render-host>/auth/login`, that URL does not exist — use `VITE_API_URL` pointing at the Render host (see step 3). The frontend code normalizes the base URL to always use `/api`.
 
 ---
 

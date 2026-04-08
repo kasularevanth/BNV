@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+/**
+ * Backend mounts all routes under `/api`. Production env often omits `/api` by mistake.
+ * Normalize so `https://host` and `https://host/api` both work.
+ */
+function getApiBaseUrl() {
+  const raw = (import.meta.env.VITE_API_URL || '').trim();
+  if (!raw) return '/api';
+  const base = raw.replace(/\/$/, '');
+  return base.endsWith('/api') ? base : `${base}/api`;
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getApiBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
 });
 
