@@ -3,6 +3,7 @@
 A full-stack MERN application where **Designers** upload product mockups and **Clients** browse and place orders.
 
 **Live demo (Vercel):** [https://bnv-brown.vercel.app/login](https://bnv-brown.vercel.app/login) — App root: [https://bnv-brown.vercel.app](https://bnv-brown.vercel.app)
+**Video walkthrough (Loom):** [https://www.loom.com/share/69010750830b4d85b723476ae53ff8a5](https://www.loom.com/share/69010750830b4d85b723476ae53ff8a5)
 
 ## Tech Stack
 
